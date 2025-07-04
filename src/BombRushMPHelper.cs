@@ -1,0 +1,57 @@
+using BepInEx;
+using BepInEx.Logging;
+using BepInEx.Configuration;
+using HarmonyLib;
+using UnityEngine; 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.IO;
+using System.Text;
+using Reptile;
+
+using BombRushMP.Common;
+using BombRushMP.CrewBoom;
+using BombRushMP.Plugin;
+using CrewBoomMono;
+
+namespace CharacterSwapApp;
+
+internal class BombRushMPHelper {
+    public static Reptile.Player Player { get { return AppCharacterSwap.Player; } }
+    public static bool HasStreamedCharacters { get { return BundlePathByGUID().Count > 0; } }
+
+    public static void ReloadStreamer() {
+        if (!CrewBoomStreamer.AlreadyLoadedThisSession) CrewBoomStreamer.ReloadCharacters(); 
+    }
+
+    public static void SetStreamedCharacter(Guid guid, int outfit = 0) {
+        PlayerComponent.Get(Player).SetStreamedCharacter(guid, outfit);
+    }
+
+    public static string GetStreamedCharacterName(Guid guid) {
+        CharacterHandle handle = CrewBoomStreamer.RequestCharacter(guid, false);
+        CharacterDefinition definition = (CharacterDefinition)handle.CharacterPrefab.GetComponent(typeof(CharacterDefinition));
+        return definition.CharacterName;
+    }
+
+    public static Texture2D GetStreamedCharacterTag(Guid guid) {
+        CharacterHandle handle = CrewBoomStreamer.RequestCharacter(guid, false); 
+        CharacterDefinition definition = (CharacterDefinition)handle.CharacterPrefab.GetComponent(typeof(CharacterDefinition));
+        return definition.Graffiti.mainTexture as Texture2D;
+    }
+
+    public static List<Guid> ListOfStreamedCharacterGUIDs() {
+        return BundlePathByGUID().Keys.ToList(); 
+    }
+
+    public static Dictionary<Guid, string> BundlePathByGUID() {
+        var crewBoomStreamerType = typeof(CrewBoomStreamer);
+        var field = crewBoomStreamerType.GetField("BundlePathByGUID", BindingFlags.NonPublic | BindingFlags.Static);
+        Dictionary<Guid, string> bundleByGUID = field?.GetValue(null) as Dictionary<Guid, string>;
+        return bundleByGUID; 
+    }
+    
+}

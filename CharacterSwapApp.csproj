@@ -27,7 +27,11 @@
   <Reference Include="CommonAPI.dll"><HintPath>lib\CommonAPI.dll</HintPath></Reference>
   <Reference Include="CrewBoom.dll"><HintPath>lib\CrewBoom.dll</HintPath></Reference>
   <Reference Include="CrewBoomAPI.dll"><HintPath>lib\CrewBoomAPI.dll</HintPath></Reference>
+  <Reference Include="CrewBoomMono.dll"><HintPath>lib\CrewBoomMono.dll</HintPath></Reference>
   <Reference Include="Unity.TextMeshPro.dll"><HintPath>lib\Unity.TextMeshPro.dll</HintPath></Reference>
   <Reference Include="UnityEngine.UI.dll"><HintPath>lib\UnityEngine.UI.dll</HintPath></Reference>
+  <Reference Include="BombRushMP.Common.dll"><HintPath>lib\BombRushMP.Common.dll</HintPath></Reference>
+  <Reference Include="BombRushMP.CrewBoom.dll"><HintPath>lib\BombRushMP.CrewBoom.dll</HintPath></Reference>
+  <Reference Include="BombRushMP.Plugin.dll"><HintPath>lib\BombRushMP.Plugin.dll</HintPath></Reference>
   </ItemGroup>
 </Project>

@@ -50,6 +50,18 @@ public class AppCharacterSwap : CustomApp {
                 MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
             };
             ScrollView.AddButton(nextButton);
+
+            if (CharacterSwapPlugin.BombRushMPInstalled) {
+                BombRushMPHelper.ReloadStreamer(); 
+                if (BombRushMPHelper.HasStreamedCharacters) {
+                    nextButton = PhoneUIUtility.CreateSimpleButton("BombRushMP.CrewBoom characters...");
+                    nextButton.OnConfirm += () => { 
+                        AppCharacterSwapList.Instance.AddStreamedCharacterButtons(); 
+                        MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
+                    };
+                    ScrollView.AddButton(nextButton);
+                }
+            }
         } else {
             nextButton = PhoneUIUtility.CreateSimpleButton("Swap character...");
             nextButton.OnConfirm += () => { 
@@ -85,8 +97,13 @@ public class AppCharacterSwap : CustomApp {
     }
     
     public static void SwapOutfit() {
-        int currentPlayerOutfit = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).outfit;
-        Player.SetOutfit((currentPlayerOutfit + 1) % 4);
+        if (AppCharacterSwapList.usingStreamedCharacter) {
+            int newOutfit = (AppCharacterSwapList.currentStreamedOutfit + 1) % 4;
+            AppCharacterSwapList.SwapToStreamedCharacter(AppCharacterSwapList.currentStreamedCharacterGUID, newOutfit);
+        } else {
+            int currentPlayerOutfit = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).outfit;
+            Player.SetOutfit((currentPlayerOutfit + 1) % 4);
+        }
     }
 
     public static void SwapMoveStyle() {
