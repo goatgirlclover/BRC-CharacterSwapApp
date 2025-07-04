@@ -16,7 +16,7 @@ using CommonAPI;
 
 namespace CharacterSwapApp; 
 
-[BepInPlugin("goatgirl.CharacterSwapApp", "CharacterSwapApp", "1.0.0")]
+[BepInPlugin("goatgirl.CharacterSwapApp", "CharacterSwapApp", "1.0.1")]
 [BepInProcess("Bomb Rush Cyberfunk.exe")]
 [BepInDependency("CommonAPI", BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency("CrewBoom", BepInDependency.DependencyFlags.SoftDependency)]
