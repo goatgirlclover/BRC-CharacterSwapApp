@@ -16,7 +16,7 @@ using CommonAPI;
 
 namespace CharacterSwapApp; 
 
-[BepInPlugin("goatgirl.CharacterSwapApp", "CharacterSwapApp", "1.0.1")]
+[BepInPlugin("goatgirl.CharacterSwapApp", "CharacterSwapApp", "1.1.0")]
 [BepInProcess("Bomb Rush Cyberfunk.exe")]
 [BepInDependency("CommonAPI", BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency("CrewBoom", BepInDependency.DependencyFlags.SoftDependency)]
@@ -42,13 +42,11 @@ public class CharacterSwapPlugin : BaseUnityPlugin
                 Logger.LogInfo("CrewBoom found!");
             }
 
-            /* Streamed character support not ready for release
             if (plugin.Value.Metadata.GUID.Contains("BombRushMP.Plugin") || plugin.Value.Metadata.GUID.Equals("BombRushMP.Plugin"))
             { 
                 BombRushMPInstalled = true; 
                 Logger.LogInfo("BombRushMP found!");
             }
-            */
         }       
 
         Logger.LogInfo($"Plugin goatgirl.CharacterSwapApp is loaded!");

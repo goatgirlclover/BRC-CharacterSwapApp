@@ -25,6 +25,10 @@ internal class CrewBoomHelper {
         return CharacterDatabase.GetCharacter(character, out CustomCharacter customCharacter);
     }
 
+    public static bool IsNoCypherCharacter(Characters character) { 
+        return !CharacterDatabase.HasCypherEnabledForCharacter(character);
+    }
+
     public static string CustomCharacterName(Characters character) {
         if (CharacterDatabase.GetCharacterName(character, out string name)) {
             return name;

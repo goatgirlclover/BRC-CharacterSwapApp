@@ -27,6 +27,7 @@ public class AppCharacterSwapList : CustomApp {
     public static bool usingStreamedCharacter = false;
     public static Guid currentStreamedCharacterGUID;
     public static int currentStreamedOutfit = 0;
+    public static int currentStreamedMoveStyleSkin = -1;
 
     public static void Initialize() { 
         PhoneAPI.RegisterApp<AppCharacterSwapList>("character swap list"); 
@@ -55,9 +56,17 @@ public class AppCharacterSwapList : CustomApp {
     public static void SwapToCharacter(int character) { SwapToCharacter((Characters)character); }
     
     public static void SwapToStreamedCharacter(Guid character, int outfit = 0) { 
+        currentStreamedCharacterGUID = Guid.Empty;
+        currentStreamedOutfit = outfit;
+        var handle = BombRushMPHelper.RequestCharacter(character, true); 
+        if (handle.Finished) { FinalizeStreamedCharacter(character, outfit); }
+        else { handle.OnLoadFinished += () => FinalizeStreamedCharacter(character, outfit); }
+    }
+
+    public static void FinalizeStreamedCharacter(Guid character, int outfit) {
+        if (currentStreamedCharacterGUID != Guid.Empty) return; 
         BombRushMPHelper.SetStreamedCharacter(character, outfit); 
         usingStreamedCharacter = true;
-        currentStreamedOutfit = outfit;
         currentStreamedCharacterGUID = character;
     }
 
@@ -91,18 +100,30 @@ public class AppCharacterSwapList : CustomApp {
     }
 
     public static void AddCustomCharacterButtons(PhoneScrollView scrollView) {
-        Dictionary<string, SimplePhoneButton> buttons = new Dictionary<string, SimplePhoneButton>();
-        List<string> characterNames = new List<string>();
+        Dictionary<int, string> cypherCharacters = new Dictionary<int, string>();
+        Dictionary<int, string> noCypherCharacters = new Dictionary<int, string>();
+
         foreach (var keyValuePair in ListOfCustomCharacters()) {
-            int character = keyValuePair.Key;
-            string characterName = keyValuePair.Value;
-            buttons[characterName] = CreateButton(character, characterName); //scrollView.AddButton(CreateButton(character, characterName));
-            characterNames.Add(characterName);
+            if (CrewBoomHelper.IsNoCypherCharacter((Characters)keyValuePair.Key)) { noCypherCharacters[keyValuePair.Key] = keyValuePair.Value; }
+            else { cypherCharacters[keyValuePair.Key] = keyValuePair.Value; }
+            Debug.Log(keyValuePair.Value + ": " + CrewBoomHelper.IsNoCypherCharacter((Characters)keyValuePair.Key));
         }
 
-        characterNames.Sort();
-        foreach (string name in characterNames) {
-            scrollView.AddButton(buttons[name]);
+        foreach (Dictionary<int, string> characterSet in new List<Dictionary<int, string>> { cypherCharacters, noCypherCharacters }) {
+            Dictionary<string, SimplePhoneButton> buttons = new Dictionary<string, SimplePhoneButton>();
+            List<string> characterNames = new List<string>();
+
+            foreach (var keyValuePair in characterSet) {
+                int character = keyValuePair.Key;
+                string characterName = keyValuePair.Value;
+                buttons[characterName] = CreateButton(character, characterName); //scrollView.AddButton(CreateButton(character, characterName));
+                characterNames.Add(characterName);
+            }
+
+            characterNames.Sort();
+            foreach (string name in characterNames) {
+                scrollView.AddButton(buttons[name]);
+            }
         }
     }
 
@@ -147,23 +168,6 @@ public class AppCharacterSwapList : CustomApp {
     public static SimplePhoneButton CreateStreamButton(Guid character, string characterName) {
         SimplePhoneButton nextButton = PhoneUIUtility.CreateSimpleButton(characterName);
         nextButton.OnConfirm += () => { SwapToStreamedCharacter(character); };
-
-        float logoSize = 100f;
-        float logoDistance = logoSize + 5f;
-
-        /* var logo = new GameObject(characterName + " Tag");
-        var logoImage = logo.AddComponent<Image>();
-        logo.RectTransform().sizeDelta = new Vector2(logoSize, logoSize);
-
-        if (!tagSpritesStreamed.ContainsKey(character)) 
-            tagSpritesStreamed[character] = TextureUtility.CreateSpriteFromTexture(BombRushMPHelper.GetStreamedCharacterTag(character)); 
-        logoImage.sprite = tagSpritesStreamed[character]; 
-        
-        nextButton.Label.transform.localPosition += new Vector3(logoDistance, 0f, 0f);
-        nextButton.Label.RectTransform().sizeDelta -= new Vector2(logoDistance, 0f); 
-        logo.transform.SetParent(nextButton.Label.gameObject.transform, false); 
-        logo.RectTransform().localPosition -= new Vector3(logoDistance + 350f, 0f, 0f); */
-
         return nextButton;
     }
 

@@ -52,13 +52,13 @@ public class AppCharacterSwap : CustomApp {
             ScrollView.AddButton(nextButton);
 
             if (CharacterSwapPlugin.BombRushMPInstalled) {
-                BombRushMPHelper.ReloadStreamer(); 
                 if (BombRushMPHelper.HasStreamedCharacters) {
                     nextButton = PhoneUIUtility.CreateSimpleButton("BombRushMP.CrewBoom characters...");
                     nextButton.OnConfirm += () => { 
                         AppCharacterSwapList.Instance.AddStreamedCharacterButtons(); 
                         MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
                     };
+                    nextButton.Label.fontSizeMin -= 2f;
                     ScrollView.AddButton(nextButton);
                 }
             }
@@ -114,9 +114,16 @@ public class AppCharacterSwap : CustomApp {
     }
 
     public static void SwapMoveStyleSkin() {
-        if (currentMoveStyleSkin == -1) 
-            currentMoveStyleSkin = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).moveStyleSkin;
-        int newMoveStyleSkin = (currentMoveStyleSkin + 1) % 10;
+        int newMoveStyleSkin = 0;
+        if (!AppCharacterSwapList.usingStreamedCharacter) {
+            if (currentMoveStyleSkin == -1) 
+                currentMoveStyleSkin = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).moveStyleSkin;
+            newMoveStyleSkin = (currentMoveStyleSkin + 1) % 10;
+        } else {
+            if (AppCharacterSwapList.currentStreamedMoveStyleSkin == -1) 
+                AppCharacterSwapList.currentStreamedMoveStyleSkin = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).moveStyleSkin;
+            newMoveStyleSkin = (AppCharacterSwapList.currentStreamedMoveStyleSkin + 1) % 10;
+        }
 
         for (MoveStyle moveStyle = MoveStyle.BMX; moveStyle < MoveStyle.SPECIAL_SKATEBOARD; moveStyle++)
         {
@@ -127,7 +134,11 @@ public class AppCharacterSwap : CustomApp {
             }
         }
 
-        currentMoveStyleSkin = newMoveStyleSkin;
-        Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).moveStyleSkin = currentMoveStyleSkin;
+        if (!AppCharacterSwapList.usingStreamedCharacter) {
+            currentMoveStyleSkin = newMoveStyleSkin;
+            Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(Player.character).moveStyleSkin = currentMoveStyleSkin;
+        } else {
+            AppCharacterSwapList.currentStreamedMoveStyleSkin = newMoveStyleSkin; 
+        }
     }
 }
