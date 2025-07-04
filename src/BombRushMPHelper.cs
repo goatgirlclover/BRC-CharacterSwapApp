@@ -26,7 +26,7 @@ internal class BombRushMPHelper {
     //public static void ReloadStreamer() { if (!CrewBoomStreamer.AlreadyLoadedThisSession) CrewBoomStreamer.ReloadCharacters(); }
 
     public static void SetStreamedCharacter(Guid guid, int outfit = 0) {
-        PlayerComponent.Get(Player).SetStreamedCharacter(guid, outfit);
+        ClientController.LocalPlayerComponent.SetStreamedCharacter(guid, outfit);
     }
 
     public static string GetStreamedCharacterName(Guid guid) {
