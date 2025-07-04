@@ -116,7 +116,10 @@ public class AppCharacterSwapList : CustomApp {
             foreach (var keyValuePair in characterSet) {
                 int character = keyValuePair.Key;
                 string characterName = keyValuePair.Value;
-                buttons[characterName] = CreateButton(character, characterName); //scrollView.AddButton(CreateButton(character, characterName));
+                while (characterNames.Contains(characterName)) {
+                    characterName += "*";
+                }
+                buttons[characterName] = CreateButton(character, characterName.TrimEnd('*')); 
                 characterNames.Add(characterName);
             }
 
@@ -132,7 +135,7 @@ public class AppCharacterSwapList : CustomApp {
         List<string> characterNames = new List<string>();
         foreach (Guid guid in BombRushMPHelper.ListOfStreamedCharacterGUIDs()) {
             string characterName = BombRushMPHelper.GetStreamedCharacterName(guid);
-            buttons[characterName] = CreateStreamButton(guid, characterName); //scrollView.AddButton(CreateButton(character, characterName));
+            buttons[characterName] = CreateStreamButton(guid, characterName);
             characterNames.Add(characterName);
         }
 
