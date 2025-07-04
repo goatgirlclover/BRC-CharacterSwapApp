@@ -60,8 +60,9 @@ internal class BombRushMPHelper {
     public static bool CheckIfHasStreamedCharacters() {
         foreach(var directory in Directories())
         {
-            string[] cbbFiles = Directory.GetFiles(directory, "*.cbb", SearchOption.AllDirectories);
-            if (cbbFiles.Length > 0) { return true; }
+            foreach (string file in Directory.EnumerateFiles(directory, "*.cbb", SearchOption.AllDirectories)) {
+                if (!string.IsNullOrEmpty(file)) { return true; }
+            }
         }
         return false;
     }
