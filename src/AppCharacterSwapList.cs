@@ -28,6 +28,7 @@ public class AppCharacterSwapList : CustomApp {
     public static Guid currentStreamedCharacterGUID;
     public static int currentStreamedOutfit = 0;
     public static int currentStreamedMoveStyleSkin = -1;
+    public static bool settingUpStreaming = false;
 
     public static void Initialize() { 
         PhoneAPI.RegisterApp<AppCharacterSwapList>("character swap list"); 
@@ -56,6 +57,7 @@ public class AppCharacterSwapList : CustomApp {
     public static void SwapToCharacter(int character) { SwapToCharacter((Characters)character); }
     
     public static void SwapToStreamedCharacter(Guid character, int outfit = 0) { 
+        settingUpStreaming = true;
         currentStreamedCharacterGUID = Guid.Empty;
         currentStreamedOutfit = outfit;
         var handle = BombRushMPHelper.RequestCharacter(character, true); 
@@ -68,6 +70,7 @@ public class AppCharacterSwapList : CustomApp {
         BombRushMPHelper.SetStreamedCharacter(character, outfit); 
         usingStreamedCharacter = true;
         currentStreamedCharacterGUID = character;
+        settingUpStreaming = false;
     }
 
     public static Dictionary<int, string> ListOfCustomCharacters() {

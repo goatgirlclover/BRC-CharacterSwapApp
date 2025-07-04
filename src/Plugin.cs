@@ -25,6 +25,8 @@ public class CharacterSwapPlugin : BaseUnityPlugin
 {
     public static CharacterSwapPlugin Instance { get; private set; }
     public string Directory => Path.GetDirectoryName(Info.Location);
+    internal static Harmony Harmony = new Harmony("goatgirl.CharacterSwapApp");
+
     public static bool CrewBoomInstalled = false; 
     public static bool BombRushMPInstalled = false;
 
@@ -49,6 +51,14 @@ public class CharacterSwapPlugin : BaseUnityPlugin
             }
         }       
 
+        Harmony.PatchAll();
         Logger.LogInfo($"Plugin goatgirl.CharacterSwapApp is loaded!");
+    }
+
+    private void OnDestroy() { Harmony.UnpatchSelf(); }
+
+    public IEnumerator RefreshStreamedCharacter(Guid guid, int outfit) {
+        yield return new WaitForSeconds(.1f);
+        AppCharacterSwapList.SwapToStreamedCharacter(guid, outfit);
     }
 }
