@@ -23,6 +23,8 @@ public class AppCharacterSwap : CustomApp {
 
     private static int currentMoveStyleSkin = -1;
 
+    private static bool AddedRecentButton = false;
+
     public static void Initialize() { 
         IconSprite = TextureUtility.LoadSprite(Path.Combine(dataDirectory, "CharacterSwap-icon.png")); 
         PhoneAPI.RegisterApp<AppCharacterSwap>("character swap", IconSprite); 
@@ -36,17 +38,6 @@ public class AppCharacterSwap : CustomApp {
         CreateTitleBar("CharacterSwap", IconSprite); 
 
         SimplePhoneButton nextButton = null;
-
-        if (CharacterSwapConfig.showRecentCharacters.Value) {
-            if (AppCharacterSwapList.RecentCharacters.Count > 1) {
-                nextButton = PhoneUIUtility.CreateSimpleButton("Recent characters...");
-                nextButton.OnConfirm += () => { 
-                    AppCharacterSwapList.Instance.AddRecentCharacterButtons(); 
-                    MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
-                };
-                ScrollView.AddButton(nextButton);
-            }
-        }
 
         if (CharacterSwapPlugin.CrewBoomInstalled) {
             nextButton = PhoneUIUtility.CreateSimpleButton("Vanilla characters...");
@@ -100,6 +91,18 @@ public class AppCharacterSwap : CustomApp {
     {
         if (CharacterSwapPlugin.CrewBoomInstalled) 
             AppCharacterSwapList.Instance?.RemoveAllButtons(); 
+        
+        if (!AddedRecentButton && CharacterSwapConfig.showRecentCharacters.Value) {
+            if (AppCharacterSwapList.RecentCharacters.Count > 1) {
+                var nextButton = PhoneUIUtility.CreateSimpleButton("Recent characters...");
+                nextButton.OnConfirm += () => { 
+                    AppCharacterSwapList.Instance.AddRecentCharacterButtons(); 
+                    MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
+                };
+                ScrollView.InsertButton(0, nextButton);
+                AddedRecentButton = true;
+            }
+        }
     }
 
     public override void OnAppDisable() 

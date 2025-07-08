@@ -152,7 +152,7 @@ public class AppCharacterSwapList : CustomApp {
     }
 
     public static void AddRecentCharacterButtons(PhoneScrollView scrollView) {
-        foreach (RecentCharacterInfo rci in RecentCharacters) { CreateButton((int)rci.Character, rci.Name); }
+        foreach (RecentCharacterInfo rci in RecentCharacters) { scrollView.AddButton(CreateButton((int)rci.Character, rci.Name)); }
     }
 
     public static void AddStreamedCharacterButtons(PhoneScrollView scrollView) {
@@ -176,7 +176,13 @@ public class AppCharacterSwapList : CustomApp {
             SwapToCharacter(character); 
             if (CharacterSwapConfig.showRecentCharacters.Value) {
                 RecentCharacterInfo recentCharacterInfo = new RecentCharacterInfo((Characters)character, characterName); 
-                if (RecentCharacters.Contains(recentCharacterInfo)) { RecentCharacters.Remove(recentCharacterInfo); }
+
+                RecentCharacterInfo duplicate = null;
+                foreach (RecentCharacterInfo rci in RecentCharacters) { 
+                    if (rci.Character == recentCharacterInfo.Character) { duplicate = rci; break; } 
+                } 
+                if (duplicate != null) { RecentCharacters.Remove(duplicate); }
+
                 RecentCharacters.Insert(0, recentCharacterInfo); 
                 if (RecentCharacters.Count > 20) { RecentCharacters.RemoveAt(RecentCharacters.Count - 1); }
             }
