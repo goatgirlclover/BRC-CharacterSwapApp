@@ -93,9 +93,7 @@ public class AppCharacterSwapList : CustomApp {
                 }
             }
 
-            CharacterProgress characterProgress = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress((Characters)character);
-            bool characterUnlocked = IsHiddenCharacter((Characters)character) || characterProgress.unlocked;
-            if (characterUnlocked || !CharacterSwapConfig.onlyUnlockedCharacters.Value) {
+            if (IsCharacterUnlocked((Characters)character)) {
                 string characterName = GetVanillaCharacterName((Characters)character);
                 scrollView.AddButton(CreateButton(character, characterName));
             }
@@ -177,14 +175,23 @@ public class AppCharacterSwapList : CustomApp {
         return nextButton;
     }
 
+    public static bool IsCharacterUnlocked(Characters character) {
+        // Only care about CharacterSwapConfig if not DLC 
+        if (character == Characters.robot || character == Characters.skate) {
+            return Core.Instance.platform.DownloadableContent.IsDownloadableContentUnlocked(Core.Instance.baseModule.characterDownloadableContent);
+        } else { 
+            CharacterProgress characterProgress = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress((Characters)character);
+            return !CharacterSwapConfig.onlyUnlockedCharacters.Value || characterProgress.unlocked || IsHiddenCharacter((Characters)character); 
+        }
+    }
+
     public static bool IsHiddenCharacter(Characters character) {
         // Don't spoil Red Felix!!!
         if (character == Characters.legendMetalHead) {
             return Story.GetCurrentObjectiveInfo().chapter == Story.Chapter.CHAPTER_6; 
-        } else if (character == Characters.robot || character == Characters.skate) {
-            return Core.Instance.platform.DownloadableContent.IsDownloadableContentUnlocked(Core.Instance.baseModule.characterDownloadableContent);
+        } else {
+            return character == Characters.headMan || character == Characters.eightBallBoss || character == Characters.headManNoJetpack;
         }
-        return character == Characters.headMan || character == Characters.eightBallBoss || character == Characters.headManNoJetpack;
     }
 
     public static Texture2D GetCharacterTag(Characters character) {
