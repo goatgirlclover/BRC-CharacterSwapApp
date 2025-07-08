@@ -18,8 +18,10 @@ namespace CharacterSwapApp;
 
 public class CharacterSwapConfig {
     public static ConfigEntry<bool> onlyUnlockedCharacters;
+    public static ConfigEntry<bool> showRecentCharacters;
 
     public static void BindSettings(ConfigFile Config) {
         onlyUnlockedCharacters = Config.Bind("Settings", "Hide Locked Characters", true, "Whether to hide characters that have not been unlocked through the story yet."); 
+        showRecentCharacters = Config.Bind("Settings", "Track Recent Characters", true, "Whether to display the option to switch to your recently-used characters, sorted by how recently they were swapped to."); 
     }
 }

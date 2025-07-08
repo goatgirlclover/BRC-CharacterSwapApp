@@ -36,6 +36,18 @@ public class AppCharacterSwap : CustomApp {
         CreateTitleBar("CharacterSwap", IconSprite); 
 
         SimplePhoneButton nextButton = null;
+
+        if (CharacterSwapConfig.showRecentCharacters.Value) {
+            if (AppCharacterSwapList.RecentCharacters.Count > 1) {
+                nextButton = PhoneUIUtility.CreateSimpleButton("Recent characters...");
+                nextButton.OnConfirm += () => { 
+                    AppCharacterSwapList.Instance.AddRecentCharacterButtons(); 
+                    MyPhone.OpenApp(typeof(AppCharacterSwapList)); 
+                };
+                ScrollView.AddButton(nextButton);
+            }
+        }
+
         if (CharacterSwapPlugin.CrewBoomInstalled) {
             nextButton = PhoneUIUtility.CreateSimpleButton("Vanilla characters...");
             nextButton.OnConfirm += () => { 

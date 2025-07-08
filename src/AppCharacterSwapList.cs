@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.IO;
@@ -30,6 +31,12 @@ public class AppCharacterSwapList : CustomApp {
     public static int currentStreamedMoveStyleSkin = -1;
     public static bool settingUpStreaming = false;
 
+    public static List<RecentCharacterInfo> RecentCharacters = new List<RecentCharacterInfo>();
+    public class RecentCharacterInfo(Characters character, string characterName) {
+        public Characters Character = character;
+        public string Name = characterName;
+    }
+
     public static void Initialize() { 
         PhoneAPI.RegisterApp<AppCharacterSwapList>("character swap list"); 
     }
@@ -45,7 +52,7 @@ public class AppCharacterSwapList : CustomApp {
     public static void SwapToCharacter(Characters character) { 
         bool playerWasUsingMoveStyle = Player.usingEquippedMovestyle;
         CharacterProgress characterProgress = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(character);
-		Player.SetCharacter(character, characterProgress.outfit);
+        Player.SetCharacter(character, characterProgress.outfit);
 		Player.InitVisual();
 		Player.SetCurrentMoveStyleEquipped(characterProgress.moveStyle, true, true);
         if (playerWasUsingMoveStyle) {
@@ -96,6 +103,12 @@ public class AppCharacterSwapList : CustomApp {
             if (IsCharacterUnlocked((Characters)character)) {
                 string characterName = GetVanillaCharacterName((Characters)character);
                 scrollView.AddButton(CreateButton(character, characterName));
+
+                if (CharacterSwapConfig.showRecentCharacters.Value && RecentCharacters.Count == 0) {
+                    if (character == (int)Player.character) { 
+                        RecentCharacters.Add(new RecentCharacterInfo((Characters)character, characterName)); 
+                    }
+                }
             }
         }
     }
@@ -117,11 +130,18 @@ public class AppCharacterSwapList : CustomApp {
             foreach (var keyValuePair in characterSet) {
                 int character = keyValuePair.Key;
                 string characterName = keyValuePair.Value;
+
                 while (characterNames.Contains(characterName)) {
                     characterName += "*";
                 }
                 buttons[characterName] = CreateButton(character, characterName.TrimEnd('*')); 
                 characterNames.Add(characterName);
+
+                if (CharacterSwapConfig.showRecentCharacters.Value && RecentCharacters.Count == 0) {
+                    if (character == (int)Player.character) { 
+                        RecentCharacters.Add(new RecentCharacterInfo((Characters)character, characterName)); 
+                    }
+                }
             }
 
             characterNames.Sort();
@@ -129,6 +149,10 @@ public class AppCharacterSwapList : CustomApp {
                 scrollView.AddButton(buttons[name]);
             }
         }
+    }
+
+    public static void AddRecentCharacterButtons(PhoneScrollView scrollView) {
+        foreach (RecentCharacterInfo rci in RecentCharacters) { CreateButton((int)rci.Character, rci.Name); }
     }
 
     public static void AddStreamedCharacterButtons(PhoneScrollView scrollView) {
@@ -148,7 +172,15 @@ public class AppCharacterSwapList : CustomApp {
 
     public static SimplePhoneButton CreateButton(int character, string characterName) {
         SimplePhoneButton nextButton = PhoneUIUtility.CreateSimpleButton(characterName);
-        nextButton.OnConfirm += () => { SwapToCharacter(character); };
+        nextButton.OnConfirm += () => { 
+            SwapToCharacter(character); 
+            if (CharacterSwapConfig.showRecentCharacters.Value) {
+                RecentCharacterInfo recentCharacterInfo = new RecentCharacterInfo((Characters)character, characterName); 
+                if (RecentCharacters.Contains(recentCharacterInfo)) { RecentCharacters.Remove(recentCharacterInfo); }
+                RecentCharacters.Insert(0, recentCharacterInfo); 
+                if (RecentCharacters.Count > 20) { RecentCharacters.RemoveAt(RecentCharacters.Count - 1); }
+            }
+        };
 
         float logoSize = 100f;
         float logoDistance = logoSize + 5f;
@@ -214,5 +246,6 @@ public class AppCharacterSwapList : CustomApp {
     public void AddVanillaCharacterButtons(bool customCheck = false) { AddVanillaCharacterButtons(this.ScrollView, customCheck); }
     public void AddCustomCharacterButtons() { AddCustomCharacterButtons(this.ScrollView); }
     public void AddStreamedCharacterButtons() { AddStreamedCharacterButtons(this.ScrollView); }
+    public void AddRecentCharacterButtons() { AddRecentCharacterButtons(this.ScrollView); }
     public void RemoveAllButtons() { this.ScrollView.RemoveAllButtons(); }
 }
