@@ -54,7 +54,7 @@ public class AppCharacterSwap : CustomApp {
             };
             ScrollView.AddButton(nextButton);
 
-            if (CharacterSwapPlugin.BombRushMPInstalled) {
+            if (CharacterSwapPlugin.BombRushMPInstalled && CharacterSwapConfig.showMPCharacters.Value) {
                 if (BombRushMPHelper.HasStreamedCharacters) {
                     nextButton = PhoneUIUtility.CreateSimpleButton("BombRushMP.CrewBoom characters...");
                     nextButton.OnConfirm += () => { 
