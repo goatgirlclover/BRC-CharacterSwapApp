@@ -27,6 +27,7 @@ internal class BombRushMPHelper {
 
     public static void SetStreamedCharacter(Guid guid, int outfit = 0) {
         ClientController.Instance.LocalPlayerComponent.SetStreamedCharacter(guid, outfit);
+        ClientController.Instance.SendClientState();
     }
 
     public static string GetStreamedCharacterName(Guid guid) {
