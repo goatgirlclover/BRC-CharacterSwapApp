@@ -50,6 +50,7 @@ public class AppCharacterSwapList : CustomApp {
     }
     
     public static void SwapToCharacter(Characters character) { 
+        if (character == Player.character) { return; }
         bool playerWasUsingMoveStyle = Player.usingEquippedMovestyle;
         CharacterProgress characterProgress = Core.Instance.SaveManager.CurrentSaveSlot.GetCharacterProgress(character);
         Player.SetCharacter(character, characterProgress.outfit);
