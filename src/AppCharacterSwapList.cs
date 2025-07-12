@@ -189,21 +189,23 @@ public class AppCharacterSwapList : CustomApp {
             }
         };
 
-        float logoSize = 100f;
-        float logoDistance = logoSize + 5f;
+        try {
+            float logoSize = 100f;
+            float logoDistance = logoSize + 5f;
 
-        var logo = new GameObject(characterName + " Tag");
-        var logoImage = logo.AddComponent<Image>();
-        logo.RectTransform().sizeDelta = new Vector2(logoSize, logoSize);
+            if (!tagSprites.ContainsKey(character)) 
+                tagSprites[character] = TextureUtility.CreateSpriteFromTexture(GetCharacterTag((Characters)character)); 
 
-        if (!tagSprites.ContainsKey(character)) 
-            tagSprites[character] = TextureUtility.CreateSpriteFromTexture(GetCharacterTag((Characters)character)); 
-        logoImage.sprite = tagSprites[character]; 
-        
-        nextButton.Label.transform.localPosition += new Vector3(logoDistance, 0f, 0f);
-        nextButton.Label.RectTransform().sizeDelta -= new Vector2(logoDistance, 0f); 
-        logo.transform.SetParent(nextButton.Label.gameObject.transform, false); 
-        logo.RectTransform().localPosition -= new Vector3(logoDistance + 350f, 0f, 0f);
+            var logo = new GameObject(characterName + " Tag");
+            var logoImage = logo.AddComponent<Image>();
+            logo.RectTransform().sizeDelta = new Vector2(logoSize, logoSize);
+            logoImage.sprite = tagSprites[character]; 
+            
+            nextButton.Label.transform.localPosition += new Vector3(logoDistance, 0f, 0f);
+            nextButton.Label.RectTransform().sizeDelta -= new Vector2(logoDistance, 0f); 
+            logo.transform.SetParent(nextButton.Label.gameObject.transform, false); 
+            logo.RectTransform().localPosition -= new Vector3(logoDistance + 350f, 0f, 0f);
+        } catch (System.Exception) {} // likely failed to load character tag
 
         return nextButton;
     }
